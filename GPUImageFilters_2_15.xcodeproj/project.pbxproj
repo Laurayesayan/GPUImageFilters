@@ -3,10 +3,11 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 51;
 	objects = {
 
 /* Begin PBXBuildFile section */
+		7754299917AC729E836672F0 /* Pods_GPUImageFilters_2_15.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E4C62C20E04A740737D1FA05 /* Pods_GPUImageFilters_2_15.framework */; };
 		F7A14C6B2461A14C00F65F9E /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7A14C6A2461A14C00F65F9E /* AppDelegate.swift */; };
 		F7A14C6D2461A14C00F65F9E /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7A14C6C2461A14C00F65F9E /* SceneDelegate.swift */; };
 		F7A14C6F2461A14C00F65F9E /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7A14C6E2461A14C00F65F9E /* ViewController.swift */; };
@@ -16,6 +17,9 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		749EDB8373BD5E6CD515BA2F /* Pods-GPUImageFilters_2_15.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-GPUImageFilters_2_15.release.xcconfig"; path = "Target Support Files/Pods-GPUImageFilters_2_15/Pods-GPUImageFilters_2_15.release.xcconfig"; sourceTree = "<group>"; };
+		B78FD519C1486ACB02D32DE8 /* Pods-GPUImageFilters_2_15.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-GPUImageFilters_2_15.debug.xcconfig"; path = "Target Support Files/Pods-GPUImageFilters_2_15/Pods-GPUImageFilters_2_15.debug.xcconfig"; sourceTree = "<group>"; };
+		E4C62C20E04A740737D1FA05 /* Pods_GPUImageFilters_2_15.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_GPUImageFilters_2_15.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		F7A14C672461A14C00F65F9E /* GPUImageFilters_2_15.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GPUImageFilters_2_15.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F7A14C6A2461A14C00F65F9E /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		F7A14C6C2461A14C00F65F9E /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -31,17 +35,37 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7754299917AC729E836672F0 /* Pods_GPUImageFilters_2_15.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		18BEEA80572350B913DA875B /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				E4C62C20E04A740737D1FA05 /* Pods_GPUImageFilters_2_15.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		C6372B40646A290F1D5FB8B2 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				B78FD519C1486ACB02D32DE8 /* Pods-GPUImageFilters_2_15.debug.xcconfig */,
+				749EDB8373BD5E6CD515BA2F /* Pods-GPUImageFilters_2_15.release.xcconfig */,
+			);
+			path = Pods;
+			sourceTree = "<group>";
+		};
 		F7A14C5E2461A14C00F65F9E = {
 			isa = PBXGroup;
 			children = (
 				F7A14C692461A14C00F65F9E /* GPUImageFilters_2_15 */,
 				F7A14C682461A14C00F65F9E /* Products */,
+				C6372B40646A290F1D5FB8B2 /* Pods */,
+				18BEEA80572350B913DA875B /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -74,9 +98,11 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = F7A14C7B2461A14E00F65F9E /* Build configuration list for PBXNativeTarget "GPUImageFilters_2_15" */;
 			buildPhases = (
+				F115405379A30D8DD8F5B1A8 /* [CP] Check Pods Manifest.lock */,
 				F7A14C632461A14C00F65F9E /* Sources */,
 				F7A14C642461A14C00F65F9E /* Frameworks */,
 				F7A14C652461A14C00F65F9E /* Resources */,
+				649B5B02EC3F031EFA398714 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -132,6 +158,48 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		649B5B02EC3F031EFA398714 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-GPUImageFilters_2_15/Pods-GPUImageFilters_2_15-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-GPUImageFilters_2_15/Pods-GPUImageFilters_2_15-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-GPUImageFilters_2_15/Pods-GPUImageFilters_2_15-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		F115405379A30D8DD8F5B1A8 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-GPUImageFilters_2_15-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		F7A14C632461A14C00F65F9E /* Sources */ = {
@@ -282,9 +350,11 @@
 		};
 		F7A14C7C2461A14E00F65F9E /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = B78FD519C1486ACB02D32DE8 /* Pods-GPUImageFilters_2_15.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 9H4ZLWV74V;
 				INFOPLIST_FILE = GPUImageFilters_2_15/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -299,9 +369,11 @@
 		};
 		F7A14C7D2461A14E00F65F9E /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 749EDB8373BD5E6CD515BA2F /* Pods-GPUImageFilters_2_15.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 9H4ZLWV74V;
 				INFOPLIST_FILE = GPUImageFilters_2_15/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
