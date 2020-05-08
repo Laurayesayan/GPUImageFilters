@@ -13,16 +13,19 @@ import MobileCoreServices
 
 struct FilterFunctions {
     var demonstrationImages: [UIImage] = []
-    var function: [(UIImage) -> UIImage] = []
+    var imageFilters: [(UIImage) -> UIImage] = []
+    var videoFilters: [(GPUImageMovie, GPUImageView) -> (GPUImageMovie, GPUImageView)] = []
 }
 
 class ViewController: UIViewController {
-    private var video: AVAsset! = nil
-    private lazy var imageView = UIImageView(frame: CGRect(x: 0, y: 0, width: self.view.bounds.width, height: self.view.bounds.height))
     @IBOutlet weak var mediaSwitcher: UISwitch!
+    @IBOutlet weak var mediaView: UIView!
     private let filters = Filters()
     private var filterFunctions = FilterFunctions()
     private lazy var originalImage = UIImage()
+    private var player: AVPlayer! = nil
+    private var playerItem : AVPlayerItem! = nil
+    private var imageView: UIImageView! = nil
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -34,15 +37,24 @@ class ViewController: UIViewController {
         let image = UIImage(named: "1")!
         
         filterFunctions.demonstrationImages.append(filters.saturationFilter(image: image))
-        filterFunctions.function.append(filters.saturationFilter(image:))
+        filterFunctions.imageFilters.append(filters.saturationFilter(image:))
+        filterFunctions.videoFilters.append(filters.saturationFilter(gpuMovie:filteredView:))
+        
         filterFunctions.demonstrationImages.append(filters.anyCombination(image: image))
-        filterFunctions.function.append(filters.anyCombination(image:))
+        filterFunctions.imageFilters.append(filters.anyCombination(image:))
+        filterFunctions.videoFilters.append(filters.anyCombination(gpuMovie:filteredView:))
+        
         filterFunctions.demonstrationImages.append(filters.pixellateEfffect(image: image))
-        filterFunctions.function.append(filters.pixellateEfffect(image:))
+        filterFunctions.imageFilters.append(filters.pixellateEfffect(image:))
+        filterFunctions.videoFilters.append(filters.pixellateEfffect(gpuMovie:filteredView:))
+        
         filterFunctions.demonstrationImages.append(filters.visualEffectsCombination(image: image))
-        filterFunctions.function.append(filters.visualEffectsCombination(image:))
+        filterFunctions.imageFilters.append(filters.visualEffectsCombination(image:))
+        filterFunctions.videoFilters.append(filters.visualEffectsCombination(gpuMovie:filteredView:))
+        
         filterFunctions.demonstrationImages.append(filters.lutFilter(image: image))
-        filterFunctions.function.append(filters.lutFilter(image:))
+        filterFunctions.imageFilters.append(filters.lutFilter(image:))
+        filterFunctions.videoFilters.append(filters.lutFilter(gpuMovie:filteredView:))
     }
     
     @IBAction func addMedia(_ sender: Any) {
@@ -58,26 +70,38 @@ class ViewController: UIViewController {
     }
     
     @IBAction func playVideo(_ sender: Any) {
-        if mediaSwitcher.isOn {
-            if video != nil {
-                let playerItem = AVPlayerItem(asset: video)
-                
-                let player = AVPlayer(playerItem: playerItem)
-                
-                let controller = AVPlayerViewController()
-                controller.player = player
-                
-                present(controller, animated: true) {
-                    player.play()
-                }
-            }
-        } else {
-            let imageViewController = UIViewController()
-            imageView.contentMode = .scaleAspectFit
-            imageViewController.view.addSubview(imageView)
-            
-            self.present(imageViewController, animated: true, completion: nil)
+        if player != nil {
+            player.play()
         }
+    }
+    
+    @IBAction func pauseVideo(_ sender: Any) {
+        if player != nil {
+            player.pause()
+        }
+    }
+    
+    func addVideoToMadiaView(url: URL) {
+        player = AVPlayer()
+        
+        playerItem = AVPlayerItem(url: url)
+        player.replaceCurrentItem(with: playerItem)
+        
+        let playerLayer = AVPlayerLayer(player: player)
+        playerLayer.frame = mediaView.frame
+        mediaView.layer.addSublayer(playerLayer)
+    }
+    
+    func addImageToMediaView(image: UIImage) {
+        imageView = UIImageView()
+        imageView.image = image
+        originalImage = image
+        
+        imageView.contentMode = .scaleAspectFit
+        imageView.frame = mediaView.frame
+        
+        mediaView.addSubview(imageView)
+        print(mediaView.subviews.count)
     }
 }
 
@@ -89,15 +113,14 @@ extension ViewController: UIImagePickerControllerDelegate, UINavigationControlle
         pickerController.mediaTypes = [kUTTypeMovie as String, kUTTypeImage as String]
         present(pickerController, animated: true, completion: nil)
     }
-
+    
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
         if let url = info[UIImagePickerController.InfoKey.mediaURL] as? URL {
-            video = AVAsset(url: url)
+            addVideoToMadiaView(url: url)
         }
         
         if let image = info[UIImagePickerController.InfoKey.originalImage] as? UIImage {
-            imageView.image = image
-            originalImage = image
+            addImageToMediaView(image: image)
         }
         
         dismiss(animated: true, completion: nil)
@@ -111,16 +134,31 @@ extension ViewController: UICollectionViewDelegateFlowLayout, UICollectionViewDa
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let filtersCell = collectionView.dequeueReusableCell(withReuseIdentifier: "FiltersCell", for: indexPath) as! FiltersCollectionViewCell
-
+        
         filtersCell.filterImageView.image = filterFunctions.demonstrationImages[indexPath.row]
         
         return filtersCell
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        if let _ = imageView.image {
+        if imageView != nil {
             imageView.image = originalImage
-            imageView.image = filterFunctions.function[indexPath.row](imageView.image!)
+            imageView.image = filterFunctions.imageFilters[indexPath.row](imageView.image!)
+        }
+        
+        if playerItem != nil {
+            var gpuMovie = GPUImageMovie(playerItem: playerItem)!
+            gpuMovie.playAtActualSpeed = true
+            
+            var filteredView = GPUImageView()
+            filteredView.frame = mediaView.frame
+            mediaView.addSubview(filteredView)
+
+            (gpuMovie, filteredView) = filterFunctions.videoFilters[indexPath.row](gpuMovie, filteredView)
+            print(mediaView.subviews.count)
+            filteredView.transform = CGAffineTransform(rotationAngle: -.pi/2)
+            
+            gpuMovie.startProcessing()
         }
     }
 }
