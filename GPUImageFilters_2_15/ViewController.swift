@@ -10,14 +10,16 @@ import UIKit
 import GPUImage
 import AVKit
 import MobileCoreServices
+import Bond
 
 struct FilterFunctions {
-    var demonstrationImages: [UIImage] = []
+    var demonstrationImages = MutableObservableArray<UIImage>()
     var imageFilters: [(UIImage) -> UIImage] = []
     var videoFilters: [(GPUImageMovie, GPUImageView) -> (GPUImageMovie, GPUImageView)] = []
 }
 
 class ViewController: UIViewController {
+    @IBOutlet weak var demoImagesCollectionView: UICollectionView!
     @IBOutlet weak var mediaSwitcher: UISwitch!
     @IBOutlet weak var mediaView: UIView!
     private let filters = Filters()
@@ -25,12 +27,53 @@ class ViewController: UIViewController {
     private lazy var originalImage = UIImage()
     private var player: AVPlayer! = nil
     private var playerItem : AVPlayerItem! = nil
-    private var imageView: UIImageView! = nil
+    private lazy var imageView = UIImageView()
+    private lazy var videoView = UIView()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
         setDemonstrationImages()
+        
+        demoImagesCollectionView.reactive.selectedItemIndexPath
+            .map{$0.row}
+            .observeNext(with: { [weak self] row in
+                if self!.mediaSwitcher.isOn && self!.playerItem != nil {
+                    if self!.videoView.layer.sublayers != nil {
+                        self!.videoView.layer.sublayers = []
+                    }
+                    var gpuMovie = GPUImageMovie(playerItem: self!.playerItem)!
+                    gpuMovie.playAtActualSpeed = true
+                    
+                    var filteredView = GPUImageView()
+                    filteredView.frame = self!.mediaView.frame
+                    
+                    (gpuMovie, filteredView) = self!.filterFunctions.videoFilters[row](gpuMovie, filteredView)
+                    
+                    self!.videoView.layer.addSublayer(filteredView.layer)
+                    self!.mediaView.addSubview(self!.videoView)
+                    print(self!.mediaView.layer.sublayers?.count, "sdsdfs", self!.mediaView.subviews.count)
+                    
+                    gpuMovie.startProcessing()
+                } else if self!.originalImage.cgImage != nil {
+                    self!.imageView.image = self!.filterFunctions.imageFilters[row](self!.originalImage)
+                    self!.mediaView.addSubview(self!.imageView)
+                    print(self!.mediaView.subviews.count)
+                }
+            }).dispose(in: bag)
+        
+        filterFunctions.demonstrationImages.bind(to: demoImagesCollectionView) { [weak self]
+            (dataSource, indexPath, tableView) -> UICollectionViewCell in
+            
+            let cell = tableView.dequeueReusableCell(withReuseIdentifier: "FiltersCell", for: indexPath) as! FiltersCollectionViewCell
+            cell.filterImageView.image = self!.filterFunctions.demonstrationImages[indexPath.row]
+            
+            return cell
+        }.dispose(in: bag)
+        
+        mediaSwitcher.reactive.isOn.observeNext { [weak self] on in
+            print("It reacts")
+        }
     }
     
     private func setDemonstrationImages() {
@@ -72,6 +115,9 @@ class ViewController: UIViewController {
     @IBAction func playVideo(_ sender: Any) {
         if player != nil {
             player.play()
+            if videoView.layer.sublayers != nil {
+                print("videoView.layers",videoView.layer.sublayers?.count)
+            }
         }
     }
     
@@ -83,17 +129,23 @@ class ViewController: UIViewController {
     
     func addVideoToMadiaView(url: URL) {
         player = AVPlayer()
+        if videoView.layer.sublayers != nil {
+            videoView.layer.sublayers = []
+        }
         
         playerItem = AVPlayerItem(url: url)
         player.replaceCurrentItem(with: playerItem)
         
         let playerLayer = AVPlayerLayer(player: player)
         playerLayer.frame = mediaView.frame
-        mediaView.layer.addSublayer(playerLayer)
+//        mediaView.layer.addSublayer(playerLayer)
+        videoView.layer.addSublayer(playerLayer)
+        mediaView.addSubview(videoView)
+        
+        print(mediaView.layer.sublayers?.count, "sdsdfs", mediaView.subviews.count)
     }
     
     func addImageToMediaView(image: UIImage) {
-        imageView = UIImageView()
         imageView.image = image
         originalImage = image
         
@@ -124,41 +176,5 @@ extension ViewController: UIImagePickerControllerDelegate, UINavigationControlle
         }
         
         dismiss(animated: true, completion: nil)
-    }
-}
-
-extension ViewController: UICollectionViewDelegateFlowLayout, UICollectionViewDataSource {
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return filterFunctions.demonstrationImages.count
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let filtersCell = collectionView.dequeueReusableCell(withReuseIdentifier: "FiltersCell", for: indexPath) as! FiltersCollectionViewCell
-        
-        filtersCell.filterImageView.image = filterFunctions.demonstrationImages[indexPath.row]
-        
-        return filtersCell
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        if imageView != nil {
-            imageView.image = originalImage
-            imageView.image = filterFunctions.imageFilters[indexPath.row](imageView.image!)
-        }
-        
-        if playerItem != nil {
-            var gpuMovie = GPUImageMovie(playerItem: playerItem)!
-            gpuMovie.playAtActualSpeed = true
-            
-            var filteredView = GPUImageView()
-            filteredView.frame = mediaView.frame
-            mediaView.addSubview(filteredView)
-
-            (gpuMovie, filteredView) = filterFunctions.videoFilters[indexPath.row](gpuMovie, filteredView)
-            print(mediaView.subviews.count)
-            filteredView.transform = CGAffineTransform(rotationAngle: -.pi/2)
-            
-            gpuMovie.startProcessing()
-        }
     }
 }

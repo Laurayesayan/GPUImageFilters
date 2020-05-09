@@ -99,10 +99,6 @@
                                         </connections>
                                     </collectionViewCell>
                                 </cells>
-                                <connections>
-                                    <outlet property="dataSource" destination="BYZ-38-t0r" id="fcV-2v-1t9"/>
-                                    <outlet property="delegate" destination="BYZ-38-t0r" id="nOR-qL-QfO"/>
-                                </connections>
                             </collectionView>
                             <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="QFH-6V-sPc">
                                 <rect key="frame" x="312" y="626" width="49" height="31"/>
@@ -132,6 +128,7 @@
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                     </view>
                     <connections>
+                        <outlet property="demoImagesCollectionView" destination="Hh7-yk-EbT" id="nox-kF-B6B"/>
                         <outlet property="mediaSwitcher" destination="QFH-6V-sPc" id="A3b-L9-bfe"/>
                         <outlet property="mediaView" destination="UDp-fQ-NAQ" id="FTC-3e-zjX"/>
                     </connections>

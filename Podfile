@@ -6,5 +6,6 @@ target 'GPUImageFilters_2_15' do
   use_frameworks!
   
   pod 'GPUImage'
+  pod 'Bond'
 
 end
