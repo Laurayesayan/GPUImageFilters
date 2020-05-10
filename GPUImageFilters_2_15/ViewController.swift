@@ -28,7 +28,6 @@ class ViewController: UIViewController {
     private var player: AVPlayer! = nil
     private var playerItem : AVPlayerItem! = nil
     private lazy var imageView = UIImageView()
-    private lazy var videoView = UIView()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -39,8 +38,8 @@ class ViewController: UIViewController {
             .map{$0.row}
             .observeNext(with: { [weak self] row in
                 if self!.mediaSwitcher.isOn && self!.playerItem != nil {
-                    if self!.videoView.layer.sublayers != nil {
-                        self!.videoView.layer.sublayers = []
+                    if self!.mediaView.layer.sublayers != nil {
+                        self!.mediaView.layer.sublayers = []
                     }
                     var gpuMovie = GPUImageMovie(playerItem: self!.playerItem)!
                     gpuMovie.playAtActualSpeed = true
@@ -50,15 +49,13 @@ class ViewController: UIViewController {
                     
                     (gpuMovie, filteredView) = self!.filterFunctions.videoFilters[row](gpuMovie, filteredView)
                     
-                    self!.videoView.layer.addSublayer(filteredView.layer)
-                    self!.mediaView.addSubview(self!.videoView)
-                    print(self!.mediaView.layer.sublayers?.count, "sdsdfs", self!.mediaView.subviews.count)
+                    self!.mediaView.layer.addSublayer(filteredView.layer)
                     
                     gpuMovie.startProcessing()
-                } else if self!.originalImage.cgImage != nil {
+                    
+                } else if !self!.mediaSwitcher.isOn && self!.imageView.image != nil {
                     self!.imageView.image = self!.filterFunctions.imageFilters[row](self!.originalImage)
                     self!.mediaView.addSubview(self!.imageView)
-                    print(self!.mediaView.subviews.count)
                 }
             }).dispose(in: bag)
         
@@ -72,8 +69,17 @@ class ViewController: UIViewController {
         }.dispose(in: bag)
         
         mediaSwitcher.reactive.isOn.observeNext { [weak self] on in
-            print("It reacts")
-        }
+            if !on {
+                if self!.mediaView.layer.sublayers != nil {
+                    self!.mediaView.layer.sublayers = []
+                }
+                self!.imageView = UIImageView()
+                self!.playerItem = nil
+                self!.player = nil
+            } else {
+                self!.imageView.removeFromSuperview()
+            }
+        }.dispose(in: bag)
     }
     
     private func setDemonstrationImages() {
@@ -115,9 +121,6 @@ class ViewController: UIViewController {
     @IBAction func playVideo(_ sender: Any) {
         if player != nil {
             player.play()
-            if videoView.layer.sublayers != nil {
-                print("videoView.layers",videoView.layer.sublayers?.count)
-            }
         }
     }
     
@@ -129,8 +132,8 @@ class ViewController: UIViewController {
     
     func addVideoToMadiaView(url: URL) {
         player = AVPlayer()
-        if videoView.layer.sublayers != nil {
-            videoView.layer.sublayers = []
+        if mediaView.layer.sublayers != nil {
+            mediaView.layer.sublayers = []
         }
         
         playerItem = AVPlayerItem(url: url)
@@ -138,11 +141,7 @@ class ViewController: UIViewController {
         
         let playerLayer = AVPlayerLayer(player: player)
         playerLayer.frame = mediaView.frame
-//        mediaView.layer.addSublayer(playerLayer)
-        videoView.layer.addSublayer(playerLayer)
-        mediaView.addSubview(videoView)
-        
-        print(mediaView.layer.sublayers?.count, "sdsdfs", mediaView.subviews.count)
+        mediaView.layer.addSublayer(playerLayer)
     }
     
     func addImageToMediaView(image: UIImage) {
@@ -153,7 +152,6 @@ class ViewController: UIViewController {
         imageView.frame = mediaView.frame
         
         mediaView.addSubview(imageView)
-        print(mediaView.subviews.count)
     }
 }
 
