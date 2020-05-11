@@ -131,11 +131,11 @@ class ViewController: UIViewController {
     }
     
     func addVideoToMadiaView(url: URL) {
-        player = AVPlayer()
         if mediaView.layer.sublayers != nil {
             mediaView.layer.sublayers = []
         }
         
+        player = AVPlayer()
         playerItem = AVPlayerItem(url: url)
         player.replaceCurrentItem(with: playerItem)
         
@@ -145,6 +145,10 @@ class ViewController: UIViewController {
     }
     
     func addImageToMediaView(image: UIImage) {
+        if playerItem != nil {
+            mediaSwitcher.isOn = false
+        }
+        
         imageView.image = image
         originalImage = image
         
@@ -160,7 +164,9 @@ extension ViewController: UIImagePickerControllerDelegate, UINavigationControlle
         let pickerController = UIImagePickerController()
         pickerController.delegate = self
         pickerController.sourceType = sourceType
-        pickerController.mediaTypes = [kUTTypeMovie as String, kUTTypeImage as String]
+        if mediaSwitcher.isOn {
+            pickerController.mediaTypes = [kUTTypeMovie as String]
+        }
         present(pickerController, animated: true, completion: nil)
     }
     
