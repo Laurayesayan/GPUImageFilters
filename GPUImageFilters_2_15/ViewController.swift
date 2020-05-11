@@ -41,21 +41,11 @@ class ViewController: UIViewController {
                     if self!.mediaView.layer.sublayers != nil {
                         self!.mediaView.layer.sublayers = []
                     }
-                    var gpuMovie = GPUImageMovie(playerItem: self!.playerItem)!
-                    gpuMovie.playAtActualSpeed = true
-                    
-                    var filteredView = GPUImageView()
-                    filteredView.frame = self!.mediaView.frame
-                    
-                    (gpuMovie, filteredView) = self!.filterFunctions.videoFilters[row](gpuMovie, filteredView)
-                    
-                    self!.mediaView.layer.addSublayer(filteredView.layer)
-                    
-                    gpuMovie.startProcessing()
+
+                    self!.startVideoFilter(number: row)
                     
                 } else if !self!.mediaSwitcher.isOn && self!.imageView.image != nil {
-                    self!.imageView.image = self!.filterFunctions.imageFilters[row](self!.originalImage)
-                    self!.mediaView.addSubview(self!.imageView)
+                    self!.startImageFilter(number: row)
                 }
             }).dispose(in: bag)
         
@@ -139,9 +129,25 @@ class ViewController: UIViewController {
         playerItem = AVPlayerItem(url: url)
         player.replaceCurrentItem(with: playerItem)
         
-        let playerLayer = AVPlayerLayer(player: player)
-        playerLayer.frame = mediaView.frame
-        mediaView.layer.addSublayer(playerLayer)
+        startVideoFilter(number: 0)
+    }
+    
+    func startVideoFilter(number row: Int) {
+        var gpuMovie = GPUImageMovie(playerItem: playerItem)!
+        gpuMovie.playAtActualSpeed = true
+        
+        var filteredView = GPUImageView()
+        filteredView.frame = mediaView.frame
+        
+        (gpuMovie, filteredView) = filterFunctions.videoFilters[row](gpuMovie, filteredView)
+        mediaView.layer.addSublayer(filteredView.layer)
+        
+        gpuMovie.startProcessing()
+    }
+    
+    func startImageFilter(number row: Int) {
+        imageView.image = filterFunctions.imageFilters[row](originalImage)
+        mediaView.addSubview(imageView)
     }
     
     func addImageToMediaView(image: UIImage) {
@@ -155,7 +161,7 @@ class ViewController: UIViewController {
         imageView.contentMode = .scaleAspectFit
         imageView.frame = mediaView.frame
         
-        mediaView.addSubview(imageView)
+        startImageFilter(number: 0)
     }
 }
 
